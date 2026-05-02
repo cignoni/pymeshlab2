@@ -1,0 +1,3 @@
+[submodule "external/QMeshLab"]
+	path = external/QMeshLab
+	url = https://github.com/cignoni/QMeshLab.git
