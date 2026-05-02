@@ -1,0 +1,62 @@
+pymeshlab2
+=========
+
+`pymeshlab2` is a Python library built with nanobind, designed to mimic QMeshLab behavior as closely as possible.
+
+The core goal is a one-to-one mapping between QMeshLab filters and methods of a Python `MeshSet` object.
+Each QMeshLab filter should be callable from Python with equivalent parameters, validation rules, and results.
+
+Project Goal
+------------
+
+- Provide a scripting-first interface over QMeshLab core functionality.
+- Keep filter behavior consistent with QMeshLab (same defaults, same checks, same side effects).
+- Expose a clean Python API while reusing the existing C++ filter engine.
+
+Guiding Principles
+------------------
+
+- Behavioral parity first: correctness over convenience.
+- Reuse existing C++ logic for parameter normalization and validation.
+- Keep API generation data-driven from filter descriptors when possible.
+- Avoid manual duplication of filter signatures across C++ and Python.
+
+High-Level Design
+-----------------
+
+- QMeshLab core (in `external/QMeshLab`) remains the authoritative backend.
+- A nanobind extension module exposes a Python-facing `MeshSet` class.
+- `MeshSet` owns a document-like backend state and forwards filter execution.
+- Filter metadata is used to build Python methods and docstrings.
+
+Phase A (Scaffold)
+------------------
+
+Phase A focuses on getting a working minimal vertical slice:
+
+- Build system wiring for a nanobind extension in this repository.
+- C++ backend wrapper around QMeshLab document/filter execution.
+- Python `MeshSet` class with foundational operations:
+	- load mesh
+	- save current mesh
+	- query mesh count/current mesh
+	- list available filters
+	- apply a filter by id/key with a parameter dictionary
+- Basic error translation from C++ failures to Python exceptions/messages.
+- Initial tests that validate import, simple mesh I/O, and one filter call.
+
+Out of Scope for Phase A
+------------------------
+
+- Full automatic generation of one method per filter id.
+- Full plugin-family parity test matrix.
+- Advanced progress/cancel plumbing in Python.
+
+Next Steps
+----------
+
+1. Scaffold CMake and nanobind module structure.
+2. Implement a minimal C++ wrapper (`MeshSetCore`) over the QMeshLab backend.
+3. Expose minimal `MeshSet` APIs in nanobind.
+4. Add smoke tests and one representative filter integration test.
+5. Iterate toward full one-to-one generated `MeshSet` filter methods.
