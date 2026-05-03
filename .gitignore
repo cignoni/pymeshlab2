@@ -1,0 +1,61 @@
+# OS/editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# CMake / native build outputs
+build/
+build-*/
+build_*/
+build-debug/
+build-release/
+build-local/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+Makefile
+Testing/
+CTestTestfile.cmake
+install_manifest.txt
+
+# Ninja / other generators
+.ninja_deps
+.ninja_log
+build.ninja
+
+# Python cache and virtual envs
+__pycache__/
+*.py[cod]
+*.so
+.Python
+.venv/
+venv/
+env/
+
+# Python packaging artifacts
+dist/
+wheelhouse/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Test / lint caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# scikit-build-core / build helpers
+_skbuild/
+
+# Local logs/temp
+*.log
+tmp/
+temp/
