@@ -34,26 +34,26 @@ set_source_files_properties(
 )
 
 add_library(qmeshlab2_backend STATIC
-    ${QMESHLAB_ROOT}/colormap.h
-    ${QMESHLAB_ROOT}/colormap.cpp
-    ${QMESHLAB_ROOT}/document.h
-    ${QMESHLAB_ROOT}/document.cpp
-    ${QMESHLAB_ROOT}/filterdescriptorloader.h
-    ${QMESHLAB_ROOT}/filterdescriptorloader.cpp
-    ${QMESHLAB_ROOT}/filterparam.h
-    ${QMESHLAB_ROOT}/filterparam.cpp
-    ${QMESHLAB_ROOT}/linerenderer.h
-    ${QMESHLAB_ROOT}/linerenderer.cpp
-    ${QMESHLAB_ROOT}/meshfilterplugin.h
-    ${QMESHLAB_ROOT}/meshfilterplugin.cpp
-    ${QMESHLAB_ROOT}/meshfilterpluginmanager.h
-    ${QMESHLAB_ROOT}/meshfilterpluginmanager.cpp
-    ${QMESHLAB_ROOT}/meshgpuresourcecache.h
-    ${QMESHLAB_ROOT}/meshgpuresourcecache.cpp
-    ${QMESHLAB_ROOT}/meshioplugin.h
-    ${QMESHLAB_ROOT}/meshiopluginmanager.h
-    ${QMESHLAB_ROOT}/meshiopluginmanager.cpp
-    ${QMESHLAB_ROOT}/vcgmesh.h
+    ${QMESHLAB_ROOT}/src/render/colormap.h
+    ${QMESHLAB_ROOT}/src/render/colormap.cpp
+    ${QMESHLAB_ROOT}/src/core/document.h
+    ${QMESHLAB_ROOT}/src/core/document.cpp
+    ${QMESHLAB_ROOT}/src/plugins/filterdescriptorloader.h
+    ${QMESHLAB_ROOT}/src/plugins/filterdescriptorloader.cpp
+    ${QMESHLAB_ROOT}/src/core/filterparam.h
+    ${QMESHLAB_ROOT}/src/core/filterparam.cpp
+    ${QMESHLAB_ROOT}/src/render/linerenderer.h
+    ${QMESHLAB_ROOT}/src/render/linerenderer.cpp
+    ${QMESHLAB_ROOT}/src/plugins/meshfilterplugin.h
+    ${QMESHLAB_ROOT}/src/plugins/meshfilterplugin.cpp
+    ${QMESHLAB_ROOT}/src/plugins/meshfilterpluginmanager.h
+    ${QMESHLAB_ROOT}/src/plugins/meshfilterpluginmanager.cpp
+    ${QMESHLAB_ROOT}/src/render/meshgpuresourcecache.h
+    ${QMESHLAB_ROOT}/src/render/meshgpuresourcecache.cpp
+    ${QMESHLAB_ROOT}/src/plugins/meshioplugin.h
+    ${QMESHLAB_ROOT}/src/plugins/meshiopluginmanager.h
+    ${QMESHLAB_ROOT}/src/plugins/meshiopluginmanager.cpp
+    ${QMESHLAB_ROOT}/src/core/vcgmesh.h
 
     ${QMESHLAB_ROOT}/plugins/meshpluginregistry.h
     ${QMESHLAB_ROOT}/plugins/meshpluginregistry.cpp
@@ -76,7 +76,10 @@ target_compile_definitions(qmeshlab2_backend
 
 target_include_directories(qmeshlab2_backend
     PUBLIC
-        ${QMESHLAB_ROOT}
+    ${QMESHLAB_ROOT}
+    ${QMESHLAB_ROOT}/src/core
+    ${QMESHLAB_ROOT}/src/render
+    ${QMESHLAB_ROOT}/src/plugins
         ${QMESHLAB_ROOT}/vcglib
         ${QMESHLAB_ROOT}/vcglib/eigenlib
 )
@@ -113,22 +116,22 @@ if (NOT nanobind_FOUND)
     FetchContent_MakeAvailable(nanobind)
 endif()
 
-nanobind_add_module(_pymeshlab2
+nanobind_add_module(_qmeshlab
     NB_STATIC
-    src/cpp/module.cpp
-    src/cpp/meshset_core.cpp
+    external/QMeshLab/src/python/bindings/module.cpp
+    external/QMeshLab/src/python/bindings/meshset_core.cpp
 )
 
-target_include_directories(_pymeshlab2
+target_include_directories(_qmeshlab
     PRIVATE
-        src/cpp
+        external/QMeshLab/src/python/bindings
 )
 
-target_link_libraries(_pymeshlab2
+target_link_libraries(_qmeshlab
     PRIVATE
     qmeshlab2_backend
 )
 
 if (SKBUILD)
-    install(TARGETS _pymeshlab2 LIBRARY DESTINATION pymeshlab2)
+    install(TARGETS _qmeshlab LIBRARY DESTINATION pymeshlab2)
 endif()
