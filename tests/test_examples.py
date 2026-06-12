@@ -66,22 +66,20 @@ def test_raster_basics_example():
 def test_wavy_box_example_if_filters_are_available(tmp_path: Path):
     pymeshlab2 = pytest.importorskip("pymeshlab2")
     available = {item.id for item in pymeshlab2.MeshSet().list_filters()}
-    wavy_box = _example("wavy_box")
-    missing = sorted(wavy_box.REQUIRED_FILTERS - available)
+    missing = sorted(
+        {
+            "create_box",
+            "meshing_surface_subdivision_midpoint",
+            "per_vertex_geometric_function",
+            "meshing_isotropic_explicit_remeshing",
+        }
+        - available
+    )
     if missing:
         pytest.skip("wavy box example needs unavailable filters: " + ", ".join(missing))
 
     output = tmp_path / "wavy_box.ply"
-    written = wavy_box.main(
-        [
-            "--output",
-            str(output),
-            "--midpoint-iterations",
-            "2",
-            "--remesh-iterations",
-            "2",
-        ]
-    )
+    written = _example("wavy_box").main([str(output)])
 
     assert written == output
     assert output.exists()

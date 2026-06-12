@@ -1,5 +1,3 @@
-"""Normalize a mesh to a unit box and save the result."""
-
 from __future__ import annotations
 
 import argparse
@@ -12,13 +10,9 @@ DEFAULT_MESH = Path(__file__).resolve().parents[1] / "external/QMeshLab/tests/da
 
 
 def main(argv: list[str] | None = None) -> Path:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser()
     parser.add_argument("mesh", nargs="?", default=str(DEFAULT_MESH), help="mesh file to normalize")
-    parser.add_argument(
-        "--output",
-        default="normalized.ply",
-        help="where to write the normalized mesh",
-    )
+    parser.add_argument("--output", default="normalized.ply", help="where to write the normalized mesh")
     parser.add_argument("--target-size", type=float, default=1.0, help="largest output box dimension")
     parser.add_argument("--no-recenter", action="store_true", help="scale without recentering to origin")
     args = parser.parse_args(argv)
@@ -27,10 +21,12 @@ def main(argv: list[str] | None = None) -> Path:
 
     meshset = pymeshlab2.MeshSet()
     meshset.load_new_mesh(args.mesh)
-    meshset.apply_filter(
-        "normalize_unit_box",
-        {"target_size": args.target_size, "recenter": not args.no_recenter},
-    )
+    params = {}
+    if args.target_size != 1.0:
+        params["target_size"] = args.target_size
+    if args.no_recenter:
+        params["recenter"] = False
+    meshset.apply_filter("normalize_unit_box", params)
     meshset.save_current_mesh(str(output))
 
     print(output)

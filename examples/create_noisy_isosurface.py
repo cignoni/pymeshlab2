@@ -1,5 +1,3 @@
-"""Generate a small noisy isosurface mesh."""
-
 from __future__ import annotations
 
 import argparse
@@ -8,12 +6,13 @@ import pymeshlab2
 
 
 def main(argv: list[str] | None = None) -> pymeshlab2.FilterRunResult:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--resolution", type=int, default=16, help="volume resolution")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--resolution", type=int, default=64, help="volume resolution")
     args = parser.parse_args(argv)
 
     meshset = pymeshlab2.MeshSet()
-    result = meshset.apply_filter("create_noisy_isosurface", {"resolution": args.resolution})
+    params = {"resolution": args.resolution} if args.resolution != 64 else {}
+    result = meshset.apply_filter("create_noisy_isosurface", params)
     if not result.new_mesh_indices:
         raise RuntimeError("create_noisy_isosurface did not create a mesh")
 

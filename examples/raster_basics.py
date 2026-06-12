@@ -1,16 +1,10 @@
-"""Show the raster-related MeshSet API on an empty document."""
-
 from __future__ import annotations
-
-import argparse
 
 import pymeshlab2
 
 
 def main(argv: list[str] | None = None) -> tuple[int, int]:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.parse_args(argv)
-
+    _ = argv
     meshset = pymeshlab2.MeshSet()
     raster_state = (meshset.raster_count(), meshset.current_raster())
 
