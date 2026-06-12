@@ -11,7 +11,10 @@ def test_meshset_import_and_filter_listing():
     filters = ms.list_filters()
 
     assert len(filters) > 0
-    assert any(f.id == "mesh_info" for f in filters)
+    mesh_info = next((f for f in filters if f.id == "mesh_info"), None)
+
+    assert mesh_info is not None
+    assert mesh_info.python_name == "get_info"
 
 
 @pytest.mark.smoke
@@ -29,3 +32,13 @@ def test_basic_filter_on_sample_mesh():
     assert result.success is True
     assert result.document_modified is False
     assert len(result.info_messages) > 0
+
+
+@pytest.mark.smoke
+def test_raster_api_is_available():
+    mod = pytest.importorskip("pymeshlab2")
+
+    ms = mod.MeshSet()
+
+    assert ms.raster_count() == 0
+    assert ms.current_raster() == -1

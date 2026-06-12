@@ -1,7 +1,7 @@
 pymeshlab2
 =========
 
-`pymeshlab2` is a Python library built with nanobind, designed to mimic QMeshLab behavior as closely as possible.
+`pymeshlab2` is a Python library , designed to mimic QMeshLab behavior as closely as possible.
 
 The core goal is a one-to-one mapping between QMeshLab filters and methods of a Python `MeshSet` object.
 Each QMeshLab filter should be callable from Python with equivalent parameters, validation rules, and results.

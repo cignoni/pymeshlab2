@@ -38,6 +38,8 @@ add_library(qmeshlab2_backend STATIC
     ${QMESHLAB_ROOT}/src/render/colormap.cpp
     ${QMESHLAB_ROOT}/src/core/document.h
     ${QMESHLAB_ROOT}/src/core/document.cpp
+    ${QMESHLAB_ROOT}/src/core/camerashot.h
+    ${QMESHLAB_ROOT}/src/core/camerashot.cpp
     ${QMESHLAB_ROOT}/src/plugins/filterdescriptorloader.h
     ${QMESHLAB_ROOT}/src/plugins/filterdescriptorloader.cpp
     ${QMESHLAB_ROOT}/src/core/filterparam.h
@@ -106,6 +108,18 @@ qt_add_resources(qmeshlab2_backend "qmeshlab2_filter_basic_descriptors"
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
 
 find_package(nanobind CONFIG QUIET)
+if (NOT nanobind_FOUND)
+    execute_process(
+        COMMAND "${Python_EXECUTABLE}" -m nanobind --cmake_dir
+        OUTPUT_VARIABLE _nanobind_cmake_dir
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+        RESULT_VARIABLE _nanobind_cmake_result
+    )
+    if (_nanobind_cmake_result EQUAL 0 AND EXISTS "${_nanobind_cmake_dir}")
+        find_package(nanobind CONFIG QUIET PATHS "${_nanobind_cmake_dir}" NO_DEFAULT_PATH)
+    endif()
+endif()
 if (NOT nanobind_FOUND)
     include(FetchContent)
     FetchContent_Declare(
