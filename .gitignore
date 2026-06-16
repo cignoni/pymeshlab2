@@ -6,6 +6,8 @@ Thumbs.db
 *.swp
 *.swo
 *~
+# Reference files (e.g. original versions of MeshLab and PyMeshLab)
+.reference/ 
 
 # CMake / native build outputs
 build/
