@@ -11,7 +11,7 @@ Thumbs.db
 
 # CMake / native build outputs
 build/
-build-*/
+build-*/ls
 build_*/
 build-debug/
 build-release/

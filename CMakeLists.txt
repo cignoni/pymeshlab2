@@ -7,7 +7,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_AUTOMOC ON)
 set(QT_NO_PRIVATE_MODULE_WARNING ON)
 
-find_package(Qt6 6.11 REQUIRED COMPONENTS Core Gui GuiPrivate)
+find_package(Qt6 6.11 REQUIRED COMPONENTS Core Gui GuiPrivate Widgets)
 
 set(QMESHLAB_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/external/QMeshLab)
 
@@ -38,34 +38,51 @@ add_library(qmeshlab2_backend STATIC
     ${QMESHLAB_ROOT}/src/render/colormap.cpp
     ${QMESHLAB_ROOT}/src/core/document.h
     ${QMESHLAB_ROOT}/src/core/document.cpp
+    ${QMESHLAB_ROOT}/src/core/document_internal.h
+    ${QMESHLAB_ROOT}/src/core/document_internal.cpp
+    ${QMESHLAB_ROOT}/src/core/document_filters.cpp
+    ${QMESHLAB_ROOT}/src/core/document_gpu.cpp
+    ${QMESHLAB_ROOT}/src/core/document_io.cpp
+    ${QMESHLAB_ROOT}/src/core/document_layers.cpp
+    ${QMESHLAB_ROOT}/src/core/document_logging.cpp
+    ${QMESHLAB_ROOT}/src/core/document_memory.cpp
+    ${QMESHLAB_ROOT}/src/core/document_project.cpp
+    ${QMESHLAB_ROOT}/src/core/document_textures.cpp
+    ${QMESHLAB_ROOT}/src/core/document_undo.cpp
+    ${QMESHLAB_ROOT}/src/core/document_undo_state.cpp
+    ${QMESHLAB_ROOT}/src/core/documentundomanager.h
+    ${QMESHLAB_ROOT}/src/core/documentundomanager.cpp
     ${QMESHLAB_ROOT}/src/core/camerashot.h
     ${QMESHLAB_ROOT}/src/core/camerashot.cpp
-    ${QMESHLAB_ROOT}/src/plugins/filterdescriptorloader.h
-    ${QMESHLAB_ROOT}/src/plugins/filterdescriptorloader.cpp
     ${QMESHLAB_ROOT}/src/core/filterparam.h
     ${QMESHLAB_ROOT}/src/core/filterparam.cpp
+    ${QMESHLAB_ROOT}/src/core/textureassociationutils.h
+    ${QMESHLAB_ROOT}/src/core/textureassociationutils.cpp
+    ${QMESHLAB_ROOT}/src/core/vcgmesh.h
     ${QMESHLAB_ROOT}/src/render/linerenderer.h
     ${QMESHLAB_ROOT}/src/render/linerenderer.cpp
+    ${QMESHLAB_ROOT}/src/render/meshgpuresourcecache.h
+    ${QMESHLAB_ROOT}/src/render/meshgpuresourcecache.cpp
+    ${QMESHLAB_ROOT}/src/render/renderingsettings.h
+    ${QMESHLAB_ROOT}/src/render/viewstate.h
+    ${QMESHLAB_ROOT}/src/render/viewtrackball.h
+    ${QMESHLAB_ROOT}/src/render/viewtrackball.cpp
+    ${QMESHLAB_ROOT}/src/plugins/filterdescriptorloader.h
+    ${QMESHLAB_ROOT}/src/plugins/filterdescriptorloader.cpp
     ${QMESHLAB_ROOT}/src/plugins/meshfilterplugin.h
     ${QMESHLAB_ROOT}/src/plugins/meshfilterplugin.cpp
     ${QMESHLAB_ROOT}/src/plugins/meshfilterpluginmanager.h
     ${QMESHLAB_ROOT}/src/plugins/meshfilterpluginmanager.cpp
-    ${QMESHLAB_ROOT}/src/render/meshgpuresourcecache.h
-    ${QMESHLAB_ROOT}/src/render/meshgpuresourcecache.cpp
     ${QMESHLAB_ROOT}/src/plugins/meshioplugin.h
     ${QMESHLAB_ROOT}/src/plugins/meshiopluginmanager.h
     ${QMESHLAB_ROOT}/src/plugins/meshiopluginmanager.cpp
-    ${QMESHLAB_ROOT}/src/core/vcgmesh.h
-
     ${QMESHLAB_ROOT}/plugins/meshpluginregistry.h
     ${QMESHLAB_ROOT}/plugins/meshpluginregistry.cpp
     ${QMESHLAB_ROOT}/plugins/filterpluginregistry.h
     ${QMESHLAB_ROOT}/plugins/filterpluginregistry.cpp
-
     ${QMESHLAB_ROOT}/plugins/io_vcg/vcgimportplugin.h
     ${QMESHLAB_ROOT}/plugins/io_vcg/vcgimportplugin.cpp
     ${QMESHLAB_ROOT}/vcglib/wrap/ply/plylib.cpp
-
     ${QMESHLAB_ROOT}/plugins/filter_basic/basicfilterplugin.h
     ${QMESHLAB_ROOT}/plugins/filter_basic/basicfilterplugin.cpp
 )
@@ -91,6 +108,7 @@ target_link_libraries(qmeshlab2_backend
         Qt6::Core
         Qt6::Gui
         Qt6::GuiPrivate
+        Qt6::Widgets
 )
 
 qt_add_resources(qmeshlab2_backend "qmeshlab2_colormaps"
@@ -134,6 +152,7 @@ nanobind_add_module(_qmeshlab
     NB_STATIC
     external/QMeshLab/src/python/bindings/module.cpp
     external/QMeshLab/src/python/bindings/meshset_core.cpp
+    external/QMeshLab/src/python/bindings/pymesh.cpp
 )
 
 target_include_directories(_qmeshlab
