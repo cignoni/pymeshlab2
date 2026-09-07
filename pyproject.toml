@@ -6,8 +6,9 @@ build-backend = "scikit_build_core.build"
 name = "pymeshlab2"
 version = "0.0.1"
 description = "Phase A scaffold for a nanobind-based QMeshLab-compatible MeshSet API"
-readme = "README"
+readme = {file = "README", content-type = "text/x-rst"}
 requires-python = ">=3.9"
+dependencies = ["numpy>=1.23"]
 
 [tool.scikit-build]
 wheel.packages = ["python/pymeshlab2"]

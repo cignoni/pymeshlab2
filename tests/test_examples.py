@@ -20,7 +20,7 @@ def test_list_filters_example():
 
     assert filters
     assert all(isinstance(item, pymeshlab2.FilterInfo) for item in filters)
-    assert any(item.id == "mesh_info" for item in filters)
+    assert any(item.id == "measure_mesh_summary" for item in filters)
 
 
 def test_mesh_info_example():
@@ -34,7 +34,10 @@ def test_mesh_info_example():
 
 
 def test_normalize_and_save_example(tmp_path: Path):
-    pytest.importorskip("pymeshlab2")
+    pymeshlab2 = pytest.importorskip("pymeshlab2")
+    available = {item.id for item in pymeshlab2.MeshSet().list_filters()}
+    if "normalize_reference_frame" not in available:
+        pytest.skip("normalize example needs the meshing plugin")
     output = tmp_path / "normalized.ply"
 
     written = _example("normalize_and_save").main(["--output", str(output)])
@@ -69,9 +72,9 @@ def test_wavy_box_example_if_filters_are_available(tmp_path: Path):
     missing = sorted(
         {
             "create_box",
-            "meshing_surface_subdivision_midpoint",
-            "per_vertex_geometric_function",
-            "meshing_isotropic_explicit_remeshing",
+            "subdivide_by_midpoint",
+            "compute_vertex_coordinates_by_expression",
+            "remesh_isotropically_vcglib",
         }
         - available
     )

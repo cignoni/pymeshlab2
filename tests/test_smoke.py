@@ -11,10 +11,10 @@ def test_meshset_import_and_filter_listing():
     filters = ms.list_filters()
 
     assert len(filters) > 0
-    mesh_info = next((f for f in filters if f.id == "mesh_info"), None)
+    mesh_info = next((f for f in filters if f.id == "measure_mesh_summary"), None)
 
     assert mesh_info is not None
-    assert mesh_info.python_name == "get_info"
+    assert mesh_info.python_name == "measure_mesh_summary"
 
 
 @pytest.mark.smoke
@@ -27,7 +27,7 @@ def test_basic_filter_on_sample_mesh():
 
     ms = mod.MeshSet()
     ms.load_new_mesh(str(mesh_path))
-    result = ms.apply_filter("mesh_info", {"precision": 2})
+    result = ms.apply_filter("measure_mesh_summary", {"precision": 2})
 
     assert result.success is True
     assert result.document_modified is False

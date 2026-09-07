@@ -12,9 +12,9 @@ def main(argv: list[str] | None = None) -> pymeshlab2.FilterRunResult:
 
     meshset = pymeshlab2.MeshSet()
     params = {"resolution": args.resolution} if args.resolution != 64 else {}
-    result = meshset.apply_filter("create_noisy_isosurface", params)
+    result = meshset.apply_filter("create_isosurface_from_perlin_noise", params)
     if not result.new_mesh_indices:
-        raise RuntimeError("create_noisy_isosurface did not create a mesh")
+        raise RuntimeError("create_isosurface_from_perlin_noise did not create a mesh")
 
     print(f"mesh_count={meshset.mesh_count()}")
     print(f"new_mesh_indices={result.new_mesh_indices}")

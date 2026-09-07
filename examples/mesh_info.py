@@ -18,7 +18,7 @@ def main(argv: list[str] | None = None) -> pymeshlab2.FilterRunResult:
     meshset = pymeshlab2.MeshSet()
     meshset.load_new_mesh(args.mesh)
     params = {"precision": args.precision} if args.precision != 3 else {}
-    result = meshset.apply_filter("mesh_info", params)
+    result = meshset.apply_filter("measure_mesh_summary", params)
 
     for message in result.info_messages:
         print(message)

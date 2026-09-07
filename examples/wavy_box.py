@@ -20,17 +20,17 @@ def main(argv: list[str] | None = None) -> pymeshlab2.MeshSet | Path:
 
     # Uniform midpoint refinement: the default threshold is bboxDiag*0.01, so set it
     # to zero to refine every edge. Iterations keeps the QMeshLab default value.
-    meshset.apply_filter("meshing_surface_subdivision_midpoint", {"Threshold": 0.0})
+    meshset.apply_filter("subdivide_by_midpoint", {"Threshold": 0.0})
 
     # Move vertices along z with amplitude SIDE/5 and frequency 3 over x and y.
     # The x and y expressions are omitted because their defaults are "x" and "y".
     meshset.apply_filter(
-        "per_vertex_geometric_function",
+        "compute_vertex_coordinates_by_expression",
         {"z": f"z + {SIDE / 5.0:.17g} * sin({omega:.17g} * x) * sin({omega:.17g} * y)"},
     )
 
     # Remesh with the isotropic-remeshing defaults.
-    meshset.apply_filter("meshing_isotropic_explicit_remeshing")
+    meshset.apply_filter("remesh_isotropically_vcglib")
 
     if argv:
         output = Path(argv[0])

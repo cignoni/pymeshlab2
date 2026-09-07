@@ -69,6 +69,8 @@ add_library(qmeshlab2_backend STATIC
     ${QMESHLAB_ROOT}/src/render/viewtrackball.cpp
     ${QMESHLAB_ROOT}/src/plugins/filterdescriptorloader.h
     ${QMESHLAB_ROOT}/src/plugins/filterdescriptorloader.cpp
+    ${QMESHLAB_ROOT}/src/plugins/filtercategories.h
+    ${QMESHLAB_ROOT}/src/plugins/filtercategories.cpp
     ${QMESHLAB_ROOT}/src/plugins/meshfilterplugin.h
     ${QMESHLAB_ROOT}/src/plugins/meshfilterplugin.cpp
     ${QMESHLAB_ROOT}/src/plugins/meshfilterpluginmanager.h
@@ -154,6 +156,8 @@ nanobind_add_module(_qmeshlab
     external/QMeshLab/src/python/bindings/meshset_core.cpp
     external/QMeshLab/src/python/bindings/pymesh.cpp
 )
+
+target_compile_definitions(_qmeshlab PRIVATE PYMESHLAB_STANDALONE=1)
 
 target_include_directories(_qmeshlab
     PRIVATE
