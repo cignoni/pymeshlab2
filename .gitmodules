@@ -1,3 +1,3 @@
 [submodule "external/QMeshLab"]
-	path = external/QMeshLab
-	url = https://github.com/cignoni/QMeshLab.git
+	path = external/meshlab2
+	url = https://github.com/cnr-isti-vclab/meshlab2.git

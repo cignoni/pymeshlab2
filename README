@@ -1,16 +1,16 @@
 pymeshlab2
 =========
 
-`pymeshlab2` is the standalone Python interface to QMeshLab.
+`pymeshlab2` is the standalone Python interface to MeshLab2.
 
-The core goal is a one-to-one mapping between QMeshLab filters and methods of a Python `MeshSet` object.
-Each QMeshLab filter should be callable from Python with equivalent parameters, validation rules, and results.
+The core goal is a one-to-one mapping between MeshLab2 filters and methods of a Python `MeshSet` object.
+Each MeshLab2 filter should be callable from Python with equivalent parameters, validation rules, and results.
 
 Project Goal
 ------------
 
-- Provide a scripting-first interface over QMeshLab core functionality.
-- Keep filter behavior consistent with QMeshLab (same defaults, same checks, same side effects).
+- Provide a scripting-first interface over MeshLab2 core functionality.
+- Keep filter behavior consistent with MeshLab2 (same defaults, same checks, same side effects).
 - Expose a clean Python API while reusing the existing C++ filter engine.
 
 Guiding Principles
@@ -24,7 +24,7 @@ Guiding Principles
 High-Level Design
 -----------------
 
-- QMeshLab core (in `external/QMeshLab`) remains the authoritative backend.
+- MeshLab2 core (in `external/meshlab2`) remains the authoritative backend.
 - A nanobind extension module exposes a Python-facing `MeshSet` class.
 - `MeshSet` owns a document-like backend state and forwards filter execution.
 - Filter metadata is used to build Python methods and docstrings.
@@ -32,11 +32,11 @@ High-Level Design
 Filter Parity
 -------------
 
-The extension links QMeshLab's authoritative core and plugin aggregate rather
+The extension links MeshLab2's authoritative core and plugin aggregate rather
 than maintaining a separate list of filters. A `pymeshlab2` wheel therefore
-exposes the same filters as a QMeshLab build made from the same revision with
+exposes the same filters as a MeshLab2 build made from the same revision with
 the same optional dependencies available.
 
-Dependency-gated plugin families are included whenever their QMeshLab
+Dependency-gated plugin families are included whenever their MeshLab2
 dependencies and submodules are present. This follows the same build rules as
 the desktop application.

@@ -5,7 +5,7 @@ build-backend = "scikit_build_core.build"
 [project]
 name = "pymeshlab2"
 version = "0.0.1"
-description = "Python bindings for the QMeshLab filter engine"
+description = "Python bindings for the MeshLab2 filter engine"
 readme = {file = "README", content-type = "text/x-rst"}
 requires-python = ">=3.9"
 dependencies = ["numpy>=1.23"]

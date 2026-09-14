@@ -6,7 +6,7 @@ from pathlib import Path
 import pymeshlab2
 
 
-DEFAULT_MESH = Path(__file__).resolve().parents[1] / "external/QMeshLab/tests/data/simple.off"
+DEFAULT_MESH = Path(__file__).resolve().parents[1] / "external/meshlab2/tests/data/simple.off"
 
 
 def main(argv: list[str] | None = None) -> Path:

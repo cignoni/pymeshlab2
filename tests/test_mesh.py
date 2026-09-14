@@ -3,13 +3,13 @@ from pathlib import Path
 import pytest
 
 
-SAMPLE_MESH = Path("external/QMeshLab/tests/data/simple.off")
+SAMPLE_MESH = Path("external/meshlab2/tests/data/simple.off")
 
 
 def test_current_mesh_exposes_geometry_as_numpy_arrays():
     mod = pytest.importorskip("pymeshlab2")
     if not SAMPLE_MESH.exists():
-        pytest.skip("QMeshLab sample mesh not found")
+        pytest.skip("MeshLab2 sample mesh not found")
 
     meshset = mod.MeshSet()
     meshset.load_new_mesh(str(SAMPLE_MESH))

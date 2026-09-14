@@ -12,7 +12,7 @@ pytestmark = pytest.mark.filters
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SAMPLE_MESH = ROOT / "external/QMeshLab/tests/data/simple.off"
+SAMPLE_MESH = ROOT / "external/meshlab2/tests/data/simple.off"
 
 FILTER_RUNNER = """
 import sys
@@ -30,7 +30,7 @@ meshset.apply_filter(filter_info.id)
 
 def _single_mesh_filter_ids() -> set[str]:
     ids: set[str] = set()
-    for descriptor in (ROOT / "external/QMeshLab/plugins").glob("*/filters.json"):
+    for descriptor in (ROOT / "external/meshlab2/plugins").glob("*/filters.json"):
         data = json.loads(descriptor.read_text())
         for item in data.get("filters", []):
             if item.get("inputDomain") == "SingleMesh":
@@ -47,7 +47,7 @@ def _exposed_single_mesh_filter_ids() -> list[str]:
 @pytest.mark.parametrize("filter_id", _exposed_single_mesh_filter_ids())
 def test_exposed_single_mesh_filters_run_with_defaults(filter_id: str):
     if not SAMPLE_MESH.exists():
-        pytest.skip("QMeshLab sample mesh not found")
+        pytest.skip("MeshLab2 sample mesh not found")
 
     try:
         result = subprocess.run(

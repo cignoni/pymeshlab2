@@ -18,7 +18,7 @@ def test_meshset_import_and_filter_listing():
 
 
 @pytest.mark.smoke
-def test_qmeshlab_filter_registry_is_linked():
+def test_meshlab2_filter_registry_is_linked():
     mod = pytest.importorskip("pymeshlab2")
 
     filters = mod.MeshSet().list_filters()
@@ -40,9 +40,9 @@ def test_qmeshlab_filter_registry_is_linked():
 def test_basic_filter_on_sample_mesh():
     mod = pytest.importorskip("pymeshlab2")
 
-    mesh_path = Path("external/QMeshLab/tests/data/simple.off")
+    mesh_path = Path("external/meshlab2/tests/data/simple.off")
     if not mesh_path.exists():
-        pytest.skip("QMeshLab sample mesh not found")
+        pytest.skip("MeshLab2 sample mesh not found")
 
     ms = mod.MeshSet()
     ms.load_new_mesh(str(mesh_path))

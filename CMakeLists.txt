@@ -7,24 +7,22 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_AUTOMOC ON)
 set(QT_NO_PRIVATE_MODULE_WARNING ON)
 
-set(QMESH_REQUIRE_VCPKG_DEPS OFF)
-set(QMESHLAB_BUILD_APP OFF)
-set(QMESHLAB_BUILD_TESTS OFF)
-set(QMESHLAB_MATH_HELP OFF)
-set(QMESHLAB_PYTHON_CONSOLE OFF)
-set(QMESH_PLUGIN_OBJ_RAPIDOBJ OFF)
-set(QMESH_PLUGIN_E57 OFF)
-set(QMESH_PLUGIN_GLTF OFF)
-if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/QMeshLab/external/meshfix/CMakeLists.txt")
-    set(QMESH_PLUGIN_FILTER_MESHFIX OFF)
+set(MESHLAB2_REQUIRE_VCPKG_DEPS OFF)
+set(MESHLAB2_MATH_HELP OFF)
+set(MESHLAB2_PYTHON_CONSOLE OFF)
+set(MESHLAB2_PLUGIN_OBJ_RAPIDOBJ OFF)
+set(MESHLAB2_PLUGIN_E57 OFF)
+set(MESHLAB2_PLUGIN_GLTF OFF)
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/meshlab2/external/meshfix/CMakeLists.txt")
+    set(MESHLAB2_PLUGIN_FILTER_MESHFIX OFF)
 endif()
-if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/QMeshLab/external/qslim/mixkit/src/MxQSlim.h")
-    set(QMESH_PLUGIN_FILTER_QSLIM OFF)
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/meshlab2/external/qslim/mixkit/src/MxQSlim.h")
+    set(MESHLAB2_PLUGIN_FILTER_QSLIM OFF)
 endif()
-if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/QMeshLab/external/quadwild-bimdf/quadwild/CMakeLists.txt")
-    set(QMESH_PLUGIN_FILTER_QUADWILD OFF)
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/meshlab2/external/quadwild-bimdf/quadwild/CMakeLists.txt")
+    set(MESHLAB2_PLUGIN_FILTER_QUADWILD OFF)
 endif()
-add_subdirectory(external/QMeshLab EXCLUDE_FROM_ALL)
+add_subdirectory(external/meshlab2 EXCLUDE_FROM_ALL)
 
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
 
@@ -51,22 +49,22 @@ if (NOT nanobind_FOUND)
     FetchContent_MakeAvailable(nanobind)
 endif()
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/external/QMeshLab/src/python/bindings/sources.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/external/meshlab2/src/python/bindings/sources.cmake)
 
-nanobind_add_module(_qmeshlab NB_STATIC ${QMESHLAB_PYTHON_BINDING_SOURCES})
+nanobind_add_module(_meshlab NB_STATIC ${MESHLAB2_PYTHON_BINDING_SOURCES})
 
-target_compile_definitions(_qmeshlab PRIVATE PYMESHLAB_STANDALONE=1)
+target_compile_definitions(_meshlab PRIVATE PYMESHLAB_STANDALONE=1)
 
-target_include_directories(_qmeshlab
+target_include_directories(_meshlab
     PRIVATE
-        external/QMeshLab/src/python/bindings
+        external/meshlab2/src/python/bindings
 )
 
-target_link_libraries(_qmeshlab
+target_link_libraries(_meshlab
     PRIVATE
-        QMeshLabPlugins
+        MeshLab2Plugins
 )
 
 if (SKBUILD)
-    install(TARGETS _qmeshlab LIBRARY DESTINATION pymeshlab2)
+    install(TARGETS _meshlab LIBRARY DESTINATION pymeshlab2)
 endif()

@@ -19,7 +19,7 @@ def main(argv: list[str] | None = None) -> pymeshlab2.MeshSet | Path:
     meshset.apply_filter("create_box")
 
     # Uniform midpoint refinement: the default threshold is bboxDiag*0.01, so set it
-    # to zero to refine every edge. Iterations keeps the QMeshLab default value.
+    # to zero to refine every edge. Iterations keeps the MeshLab2 default value.
     meshset.apply_filter("subdivide_by_midpoint", {"Threshold": 0.0})
 
     # Move vertices along z with amplitude SIDE/5 and frequency 3 over x and y.
