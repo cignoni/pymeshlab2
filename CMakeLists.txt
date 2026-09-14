@@ -7,123 +7,24 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_AUTOMOC ON)
 set(QT_NO_PRIVATE_MODULE_WARNING ON)
 
-find_package(Qt6 6.11 REQUIRED COMPONENTS Core Gui GuiPrivate Widgets)
-
-set(QMESHLAB_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/external/QMeshLab)
-
-set(QMESHLAB_COLORMAP_FILES
-    external/QMeshLab/colormaps/rainbow.json
-    external/QMeshLab/colormaps/viridis.json
-    external/QMeshLab/colormaps/gray.json
-    external/QMeshLab/colormaps/plasma.json
-    external/QMeshLab/colormaps/cividis.json
-    external/QMeshLab/colormaps/turbo.json
-)
-
-set(QMESHLAB_BASIC_FILTER_DESCRIPTOR external/QMeshLab/plugins/filter_basic/filters.json)
-
-foreach(_colormap_file IN LISTS QMESHLAB_COLORMAP_FILES)
-    get_filename_component(_colormap_name "${_colormap_file}" NAME)
-    set_source_files_properties("${_colormap_file}" PROPERTIES QT_RESOURCE_ALIAS "colormaps/${_colormap_name}")
-endforeach()
-
-set_source_files_properties(
-    ${QMESHLAB_BASIC_FILTER_DESCRIPTOR}
-    PROPERTIES
-        QT_RESOURCE_ALIAS "filters.json"
-)
-
-add_library(qmeshlab2_backend STATIC
-    ${QMESHLAB_ROOT}/src/render/colormap.h
-    ${QMESHLAB_ROOT}/src/render/colormap.cpp
-    ${QMESHLAB_ROOT}/src/core/document.h
-    ${QMESHLAB_ROOT}/src/core/document.cpp
-    ${QMESHLAB_ROOT}/src/core/document_internal.h
-    ${QMESHLAB_ROOT}/src/core/document_internal.cpp
-    ${QMESHLAB_ROOT}/src/core/document_filters.cpp
-    ${QMESHLAB_ROOT}/src/core/document_gpu.cpp
-    ${QMESHLAB_ROOT}/src/core/document_io.cpp
-    ${QMESHLAB_ROOT}/src/core/document_layers.cpp
-    ${QMESHLAB_ROOT}/src/core/document_logging.cpp
-    ${QMESHLAB_ROOT}/src/core/document_memory.cpp
-    ${QMESHLAB_ROOT}/src/core/document_project.cpp
-    ${QMESHLAB_ROOT}/src/core/document_textures.cpp
-    ${QMESHLAB_ROOT}/src/core/document_undo.cpp
-    ${QMESHLAB_ROOT}/src/core/document_undo_state.cpp
-    ${QMESHLAB_ROOT}/src/core/documentundomanager.h
-    ${QMESHLAB_ROOT}/src/core/documentundomanager.cpp
-    ${QMESHLAB_ROOT}/src/core/camerashot.h
-    ${QMESHLAB_ROOT}/src/core/camerashot.cpp
-    ${QMESHLAB_ROOT}/src/core/filterparam.h
-    ${QMESHLAB_ROOT}/src/core/filterparam.cpp
-    ${QMESHLAB_ROOT}/src/core/textureassociationutils.h
-    ${QMESHLAB_ROOT}/src/core/textureassociationutils.cpp
-    ${QMESHLAB_ROOT}/src/core/vcgmesh.h
-    ${QMESHLAB_ROOT}/src/render/linerenderer.h
-    ${QMESHLAB_ROOT}/src/render/linerenderer.cpp
-    ${QMESHLAB_ROOT}/src/render/meshgpuresourcecache.h
-    ${QMESHLAB_ROOT}/src/render/meshgpuresourcecache.cpp
-    ${QMESHLAB_ROOT}/src/render/renderingsettings.h
-    ${QMESHLAB_ROOT}/src/render/viewstate.h
-    ${QMESHLAB_ROOT}/src/render/viewtrackball.h
-    ${QMESHLAB_ROOT}/src/render/viewtrackball.cpp
-    ${QMESHLAB_ROOT}/src/plugins/filterdescriptorloader.h
-    ${QMESHLAB_ROOT}/src/plugins/filterdescriptorloader.cpp
-    ${QMESHLAB_ROOT}/src/plugins/filtercategories.h
-    ${QMESHLAB_ROOT}/src/plugins/filtercategories.cpp
-    ${QMESHLAB_ROOT}/src/plugins/meshfilterplugin.h
-    ${QMESHLAB_ROOT}/src/plugins/meshfilterplugin.cpp
-    ${QMESHLAB_ROOT}/src/plugins/meshfilterpluginmanager.h
-    ${QMESHLAB_ROOT}/src/plugins/meshfilterpluginmanager.cpp
-    ${QMESHLAB_ROOT}/src/plugins/meshioplugin.h
-    ${QMESHLAB_ROOT}/src/plugins/meshiopluginmanager.h
-    ${QMESHLAB_ROOT}/src/plugins/meshiopluginmanager.cpp
-    ${QMESHLAB_ROOT}/plugins/meshpluginregistry.h
-    ${QMESHLAB_ROOT}/plugins/meshpluginregistry.cpp
-    ${QMESHLAB_ROOT}/plugins/filterpluginregistry.h
-    ${QMESHLAB_ROOT}/plugins/filterpluginregistry.cpp
-    ${QMESHLAB_ROOT}/plugins/io_vcg/vcgimportplugin.h
-    ${QMESHLAB_ROOT}/plugins/io_vcg/vcgimportplugin.cpp
-    ${QMESHLAB_ROOT}/vcglib/wrap/ply/plylib.cpp
-    ${QMESHLAB_ROOT}/plugins/filter_basic/basicfilterplugin.h
-    ${QMESHLAB_ROOT}/plugins/filter_basic/basicfilterplugin.cpp
-)
-
-target_compile_definitions(qmeshlab2_backend
-    PRIVATE
-        QMESH_PLUGIN_IO_VCG_ENABLED=1
-        QMESH_PLUGIN_FILTER_BASIC_ENABLED=1
-)
-
-target_include_directories(qmeshlab2_backend
-    PUBLIC
-    ${QMESHLAB_ROOT}
-    ${QMESHLAB_ROOT}/src/core
-    ${QMESHLAB_ROOT}/src/render
-    ${QMESHLAB_ROOT}/src/plugins
-        ${QMESHLAB_ROOT}/vcglib
-        ${QMESHLAB_ROOT}/vcglib/eigenlib
-)
-
-target_link_libraries(qmeshlab2_backend
-    PUBLIC
-        Qt6::Core
-        Qt6::Gui
-        Qt6::GuiPrivate
-        Qt6::Widgets
-)
-
-qt_add_resources(qmeshlab2_backend "qmeshlab2_colormaps"
-    PREFIX "/"
-    FILES
-    ${QMESHLAB_COLORMAP_FILES}
-)
-
-qt_add_resources(qmeshlab2_backend "qmeshlab2_filter_basic_descriptors"
-    PREFIX "/filters/qmeshlab.filter.basic"
-    FILES
-    ${QMESHLAB_BASIC_FILTER_DESCRIPTOR}
-)
+set(QMESH_REQUIRE_VCPKG_DEPS OFF)
+set(QMESHLAB_BUILD_APP OFF)
+set(QMESHLAB_BUILD_TESTS OFF)
+set(QMESHLAB_MATH_HELP OFF)
+set(QMESHLAB_PYTHON_CONSOLE OFF)
+set(QMESH_PLUGIN_OBJ_RAPIDOBJ OFF)
+set(QMESH_PLUGIN_E57 OFF)
+set(QMESH_PLUGIN_GLTF OFF)
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/QMeshLab/external/meshfix/CMakeLists.txt")
+    set(QMESH_PLUGIN_FILTER_MESHFIX OFF)
+endif()
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/QMeshLab/external/qslim/mixkit/src/MxQSlim.h")
+    set(QMESH_PLUGIN_FILTER_QSLIM OFF)
+endif()
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/QMeshLab/external/quadwild-bimdf/quadwild/CMakeLists.txt")
+    set(QMESH_PLUGIN_FILTER_QUADWILD OFF)
+endif()
+add_subdirectory(external/QMeshLab EXCLUDE_FROM_ALL)
 
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
 
@@ -150,12 +51,9 @@ if (NOT nanobind_FOUND)
     FetchContent_MakeAvailable(nanobind)
 endif()
 
-nanobind_add_module(_qmeshlab
-    NB_STATIC
-    external/QMeshLab/src/python/bindings/module.cpp
-    external/QMeshLab/src/python/bindings/meshset_core.cpp
-    external/QMeshLab/src/python/bindings/pymesh.cpp
-)
+include(${CMAKE_CURRENT_SOURCE_DIR}/external/QMeshLab/src/python/bindings/sources.cmake)
+
+nanobind_add_module(_qmeshlab NB_STATIC ${QMESHLAB_PYTHON_BINDING_SOURCES})
 
 target_compile_definitions(_qmeshlab PRIVATE PYMESHLAB_STANDALONE=1)
 
@@ -166,7 +64,7 @@ target_include_directories(_qmeshlab
 
 target_link_libraries(_qmeshlab
     PRIVATE
-    qmeshlab2_backend
+        QMeshLabPlugins
 )
 
 if (SKBUILD)

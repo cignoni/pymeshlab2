@@ -1,7 +1,7 @@
 pymeshlab2
 =========
 
-`pymeshlab2` is a Python library , designed to mimic QMeshLab behavior as closely as possible.
+`pymeshlab2` is the standalone Python interface to QMeshLab.
 
 The core goal is a one-to-one mapping between QMeshLab filters and methods of a Python `MeshSet` object.
 Each QMeshLab filter should be callable from Python with equivalent parameters, validation rules, and results.
@@ -29,34 +29,14 @@ High-Level Design
 - `MeshSet` owns a document-like backend state and forwards filter execution.
 - Filter metadata is used to build Python methods and docstrings.
 
-Phase A (Scaffold)
-------------------
+Filter Parity
+-------------
 
-Phase A focuses on getting a working minimal vertical slice:
+The extension links QMeshLab's authoritative core and plugin aggregate rather
+than maintaining a separate list of filters. A `pymeshlab2` wheel therefore
+exposes the same filters as a QMeshLab build made from the same revision with
+the same optional dependencies available.
 
-- Build system wiring for a nanobind extension in this repository.
-- C++ backend wrapper around QMeshLab document/filter execution.
-- Python `MeshSet` class with foundational operations:
-	- load mesh
-	- save current mesh
-	- query mesh count/current mesh
-	- list available filters
-	- apply a filter by id/key with a parameter dictionary
-- Basic error translation from C++ failures to Python exceptions/messages.
-- Initial tests that validate import, simple mesh I/O, and one filter call.
-
-Out of Scope for Phase A
-------------------------
-
-- Full automatic generation of one method per filter id.
-- Full plugin-family parity test matrix.
-- Advanced progress/cancel plumbing in Python.
-
-Next Steps
-----------
-
-1. Scaffold CMake and nanobind module structure.
-2. Implement a minimal C++ wrapper (`MeshSetCore`) over the QMeshLab backend.
-3. Expose minimal `MeshSet` APIs in nanobind.
-4. Add smoke tests and one representative filter integration test.
-5. Iterate toward full one-to-one generated `MeshSet` filter methods.
+Dependency-gated plugin families are included whenever their QMeshLab
+dependencies and submodules are present. This follows the same build rules as
+the desktop application.

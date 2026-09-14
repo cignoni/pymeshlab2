@@ -60,9 +60,9 @@ def test_create_noisy_isosurface_example():
 def test_raster_basics_example():
     pytest.importorskip("pymeshlab2")
 
-    raster_count, current_raster = _example("raster_basics").main([])
+    raster_number, current_raster = _example("raster_basics").main([])
 
-    assert raster_count == 0
+    assert raster_number == 0
     assert current_raster == -1
 
 

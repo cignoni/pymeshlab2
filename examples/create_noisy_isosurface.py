@@ -16,7 +16,7 @@ def main(argv: list[str] | None = None) -> pymeshlab2.FilterRunResult:
     if not result.new_mesh_indices:
         raise RuntimeError("create_isosurface_from_perlin_noise did not create a mesh")
 
-    print(f"mesh_count={meshset.mesh_count()}")
+    print(f"mesh_number={meshset.mesh_number()}")
     print(f"new_mesh_indices={result.new_mesh_indices}")
     return result
 

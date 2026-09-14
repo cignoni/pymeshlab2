@@ -11,11 +11,8 @@ Thumbs.db
 
 # CMake / native build outputs
 build/
-build-*/ls
+build-*/
 build_*/
-build-debug/
-build-release/
-build-local/
 CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake

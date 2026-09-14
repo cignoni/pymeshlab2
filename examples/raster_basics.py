@@ -6,9 +6,9 @@ import pymeshlab2
 def main(argv: list[str] | None = None) -> tuple[int, int]:
     _ = argv
     meshset = pymeshlab2.MeshSet()
-    raster_state = (meshset.raster_count(), meshset.current_raster())
+    raster_state = (meshset.raster_number(), meshset.current_raster())
 
-    print(f"raster_count={raster_state[0]}")
+    print(f"raster_number={raster_state[0]}")
     print(f"current_raster={raster_state[1]}")
 
     return raster_state
