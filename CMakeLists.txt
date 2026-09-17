@@ -67,4 +67,21 @@ target_link_libraries(_meshlab
 
 if (SKBUILD)
     install(TARGETS _meshlab LIBRARY DESTINATION pymeshlab2)
+
+    if (TARGET MeshLab2PluginFilterQuadWild)
+        install(PROGRAMS
+            "${QUADWILD_EXECUTABLE}"
+            "${QUAD_FROM_PATCHES_EXECUTABLE}"
+            DESTINATION pymeshlab2/quadwild-bimdf/bin
+        )
+        install(DIRECTORY
+            "${CMAKE_CURRENT_SOURCE_DIR}/external/meshlab2/external/quadwild-bimdf/config"
+            DESTINATION pymeshlab2/quadwild-bimdf
+        )
+        install(FILES
+            "${CMAKE_CURRENT_SOURCE_DIR}/external/meshlab2/external/quadwild-bimdf/LICENSE"
+            DESTINATION pymeshlab2/quadwild-bimdf
+            RENAME LICENSE.txt
+        )
+    endif()
 endif()

@@ -1,0 +1,227 @@
+name: Build wheels
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wheels-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-wheels:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS 15 arm64
+            os: macos-15
+            artifact: macos-arm64
+            triplet: arm64-osx
+          - name: Windows x64
+            os: windows-2022
+            artifact: windows-x64
+            triplet: x64-windows-release
+    env:
+      CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-* cp314-*"
+      CIBW_ARCHS_MACOS: arm64
+      CIBW_ARCHS_WINDOWS: AMD64
+      CIBW_REPAIR_WHEEL_COMMAND_MACOS: python {project}/scripts/repair_macos_wheel.py {wheel} {dest_dir}
+      CIBW_TEST_COMMAND: python {project}/tests/wheel_smoke.py
+      QT_VERSION: 6.11.*
+      QT_WINDOWS_VERSION: 6.11.0
+      QT_WINDOWS_ARCH: msvc2022_64
+      QT_WINDOWS_INSTALL_DIR: ${{ github.workspace }}/Qt
+      QT_WINDOWS_PACKAGE_URL: https://download.qt.io/online/qtsdkrepository/windows_x86/desktop/qt6_6110/qt6_6110_msvc2022_64
+      QT_WINDOWS_PACKAGES: qt.qt6.6110.win64_msvc2022_64;qt.qt6.6110.addons.qtshadertools.win64_msvc2022_64;qt.qt6.6110.addons.qtimageformats.win64_msvc2022_64
+      VCPKG_ROOT: ${{ github.workspace }}/vcpkg
+      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/build-vcpkg/vcpkg_installed
+      VCPKG_OVERLAY_TRIPLETS: ${{ github.workspace }}/external/meshlab2/ci/vcpkg-triplets
+      VCPKG_TARGET_TRIPLET: ${{ matrix.triplet }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Set up MSVC
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Install macOS build tools
+        if: runner.os == 'macOS'
+        run: brew install ninja libomp autoconf autoconf-archive automake libtool
+
+      - name: Install Qt on macOS
+        if: runner.os == 'macOS'
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          host: mac
+          target: desktop
+          arch: clang_64
+          modules: qtshadertools qtimageformats
+          cache: true
+
+      - name: Cache Qt on Windows
+        if: runner.os == 'Windows'
+        id: cache-windows-qt
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.QT_WINDOWS_INSTALL_DIR }}
+          key: windows-qt-${{ env.QT_WINDOWS_VERSION }}-${{ env.QT_WINDOWS_ARCH }}-qtshadertools-qtimageformats
+
+      - name: Install Qt on Windows
+        if: runner.os == 'Windows' && steps.cache-windows-qt.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: |
+          python -m pip install "py7zr==1.0.*"
+          $script = Join-Path $env:RUNNER_TEMP "install_qt.py"
+          @'
+          import os
+          import pathlib
+          import re
+          import shutil
+          import urllib.request
+          import xml.etree.ElementTree as ET
+
+          import py7zr
+
+          base_url = os.environ["QT_WINDOWS_PACKAGE_URL"].rstrip("/")
+          install_dir = pathlib.Path(os.environ["QT_WINDOWS_INSTALL_DIR"])
+          package_names = os.environ["QT_WINDOWS_PACKAGES"].split(";")
+          download_dir = install_dir / "_downloads"
+          download_dir.mkdir(parents=True, exist_ok=True)
+
+          updates_path = download_dir / "Updates.xml"
+          urllib.request.urlretrieve(f"{base_url}/Updates.xml", updates_path)
+          packages = {
+              node.findtext("Name"): node
+              for node in ET.parse(updates_path).getroot().findall("./PackageUpdate")
+          }
+
+          for package_name in package_names:
+              node = packages[package_name]
+              version = node.findtext("Version").strip()
+              archives = re.split(r"[\s,]+", node.findtext("DownloadableArchives").strip())
+              for archive in archives:
+                  filename = f"{version}{archive}"
+                  archive_path = download_dir / filename
+                  urllib.request.urlretrieve(
+                      f"{base_url}/{package_name}/{filename}", archive_path
+                  )
+                  with py7zr.SevenZipFile(archive_path) as bundle:
+                      bundle.extractall(path=install_dir)
+          shutil.rmtree(download_dir)
+          '@ | Set-Content -Path $script -Encoding utf8
+          python $script
+
+      - name: Expose Qt on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $qtConfig = Get-ChildItem $env:QT_WINDOWS_INSTALL_DIR -Recurse -Filter Qt6Config.cmake | Select-Object -First 1
+          if ($null -eq $qtConfig) {
+            throw "Qt6Config.cmake not found under $env:QT_WINDOWS_INSTALL_DIR"
+          }
+          $qtRoot = Split-Path (Split-Path (Split-Path (Split-Path $qtConfig.FullName -Parent) -Parent) -Parent) -Parent
+          "$qtRoot\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          "QT_ROOT_DIR=$qtRoot" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "CMAKE_PREFIX_PATH=$qtRoot" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Bootstrap vcpkg on macOS
+        if: runner.os == 'macOS'
+        run: |
+          git clone https://github.com/microsoft/vcpkg "$VCPKG_ROOT"
+          baseline="$(python -c 'import json; print(json.load(open("external/meshlab2/vcpkg.json"))["builtin-baseline"])')"
+          git -C "$VCPKG_ROOT" checkout --detach "$baseline"
+          "$VCPKG_ROOT/bootstrap-vcpkg.sh" -disableMetrics
+
+      - name: Bootstrap vcpkg on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          git clone https://github.com/microsoft/vcpkg $env:VCPKG_ROOT
+          $manifest = Get-Content "external/meshlab2/vcpkg.json" | ConvertFrom-Json
+          git -C $env:VCPKG_ROOT checkout --detach $manifest.'builtin-baseline'
+          & "$env:VCPKG_ROOT\bootstrap-vcpkg.bat" -disableMetrics
+          if ($LASTEXITCODE -ne 0) {
+            throw "vcpkg bootstrap failed with exit code $LASTEXITCODE"
+          }
+
+      - name: Cache vcpkg artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.VCPKG_ROOT }}/downloads
+            ${{ env.VCPKG_INSTALLED_DIR }}
+            ~/.cache/vcpkg/archives
+            ~/AppData/Local/vcpkg/archives
+          key: wheels-vcpkg-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('external/meshlab2/vcpkg.json', 'external/meshlab2/ci/vcpkg-triplets/*.cmake') }}
+
+      - name: Install vcpkg dependencies on macOS
+        if: runner.os == 'macOS'
+        run: |
+          "$VCPKG_ROOT/vcpkg" install \
+            --triplet "$VCPKG_TARGET_TRIPLET" \
+            --overlay-triplets="$VCPKG_OVERLAY_TRIPLETS" \
+            --x-manifest-root="$GITHUB_WORKSPACE/external/meshlab2" \
+            --x-install-root="$VCPKG_INSTALLED_DIR" \
+            --clean-after-build
+
+      - name: Install vcpkg dependencies on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          & "$env:VCPKG_ROOT\vcpkg.exe" install `
+            --triplet "$env:VCPKG_TARGET_TRIPLET" `
+            --overlay-triplets="$env:VCPKG_OVERLAY_TRIPLETS" `
+            --x-manifest-root="$env:GITHUB_WORKSPACE\external\meshlab2" `
+            --x-install-root="$env:VCPKG_INSTALLED_DIR" `
+            --clean-after-build
+          if ($LASTEXITCODE -ne 0) {
+            throw "vcpkg install failed with exit code $LASTEXITCODE"
+          }
+
+      - name: Configure macOS wheel environment
+        if: runner.os == 'macOS'
+        run: |
+          openmp_root="$(brew --prefix libomp)"
+          echo "MACOSX_DEPLOYMENT_TARGET=15.0" >> "$GITHUB_ENV"
+          echo "CMAKE_PREFIX_PATH=$QT_ROOT_DIR;$openmp_root" >> "$GITHUB_ENV"
+          echo "CMAKE_ARGS=-DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=$VCPKG_TARGET_TRIPLET -DVCPKG_OVERLAY_TRIPLETS=$VCPKG_OVERLAY_TRIPLETS -DVCPKG_INSTALLED_DIR=$VCPKG_INSTALLED_DIR -DVCPKG_MANIFEST_INSTALL=OFF -DOpenMP_ROOT=$openmp_root -DOpenMP_CXX_INCLUDE_DIR=$openmp_root/include -DOpenMP_CXX_LIB_NAMES=omp -DOpenMP_omp_LIBRARY=$openmp_root/lib/libomp.dylib" >> "$GITHUB_ENV"
+
+      - name: Configure Windows wheel environment
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $vcpkgBin = Join-Path $env:VCPKG_INSTALLED_DIR "$env:VCPKG_TARGET_TRIPLET\bin"
+          $vcpkgToolchain = Join-Path $env:VCPKG_ROOT "scripts\buildsystems\vcpkg.cmake"
+          $cmakeArgs = "-DCMAKE_TOOLCHAIN_FILE=$vcpkgToolchain -DVCPKG_TARGET_TRIPLET=$env:VCPKG_TARGET_TRIPLET -DVCPKG_OVERLAY_TRIPLETS=$env:VCPKG_OVERLAY_TRIPLETS -DVCPKG_INSTALLED_DIR=$env:VCPKG_INSTALLED_DIR -DVCPKG_MANIFEST_INSTALL=OFF"
+          $vcpkgBin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          "CMAKE_ARGS=$cmakeArgs" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Build and test wheels
+        uses: pypa/cibuildwheel@v4.2.0
+        with:
+          output-dir: wheelhouse
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: pymeshlab2-wheels-${{ matrix.artifact }}
+          path: wheelhouse/*.whl
+          if-no-files-found: error
