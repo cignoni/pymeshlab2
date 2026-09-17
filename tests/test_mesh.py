@@ -17,7 +17,7 @@ def test_current_mesh_exposes_geometry_as_numpy_arrays():
 
     assert isinstance(mesh, mod.Mesh)
     assert mesh.id() == meshset.current_mesh_id()
-    assert meshset.mesh(mesh.id()).id() == mesh.id()
+    assert meshset.mesh(meshset.current_mesh_index()).id() == mesh.id()
     assert mesh.vertex_matrix().shape == (mesh.vertex_number(), 3)
     assert mesh.face_matrix().shape == (mesh.face_number(), 3)
     assert mesh.vertex_normal_matrix().shape == (mesh.vertex_number(), 3)

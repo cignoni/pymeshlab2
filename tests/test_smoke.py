@@ -27,7 +27,7 @@ def test_meshlab2_filter_registry_is_linked():
 
     assert len(plugin_ids) >= 20
     assert {
-        "create_box",
+        "create_hexahedron",
         "subdivide_by_midpoint",
         "remesh_isotropically_vcglib",
         "normalize_reference_frame",

@@ -16,7 +16,7 @@ def main(argv: list[str] | None = None) -> pymeshlab2.MeshSet | Path:
     omega = 2.0 * math.pi * 3.0 / SIDE
 
     # Start from a unit cube. No parameters are needed because size=1 is the default.
-    meshset.apply_filter("create_box")
+    meshset.apply_filter("create_hexahedron")
 
     # Uniform midpoint refinement: the default threshold is bboxDiag*0.01, so set it
     # to zero to refine every edge. Iterations keeps the MeshLab2 default value.

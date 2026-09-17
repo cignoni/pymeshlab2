@@ -71,7 +71,7 @@ def test_wavy_box_example_if_filters_are_available(tmp_path: Path):
     available = {item.id for item in pymeshlab2.MeshSet().list_filters()}
     missing = sorted(
         {
-            "create_box",
+            "create_hexahedron",
             "subdivide_by_midpoint",
             "compute_vertex_coordinates_by_expression",
             "remesh_isotropically_vcglib",
