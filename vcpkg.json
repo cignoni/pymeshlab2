@@ -1,0 +1,28 @@
+{
+  "name": "pymeshlab2",
+  "version-string": "0.1.0",
+  "description": "Native dependencies for the standalone MeshLab2 Python bindings",
+  "license": "GPL-2.0-or-later",
+  "builtin-baseline": "37bb045f3c7a747d3e5d1c13b6fe6a0aec4b5d00",
+  "dependencies": [
+    "draco",
+    "tinygltf",
+    "lib3mf",
+    "libe57format",
+    "xerces-c",
+    "rapidobj",
+    "stb",
+    "muparser",
+    "glm",
+    "embree",
+    "tbb",
+    "cgal",
+    {
+      "name": "libigl",
+      "default-features": false,
+      "features": [
+        "cgal"
+      ]
+    }
+  ]
+}
